@@ -150,7 +150,12 @@ export default function PNL() {
           holdYears={vals.hold_years}
           updateField={updateField}
         />
-        <FixedReturnBenchmark totalInvested={pnl.totalInvested} holdYears={vals.hold_years} />
+        <FixedReturnBenchmark
+          totalInvested={pnl.totalInvested}
+          holdYears={vals.hold_years}
+          benchmarkPct={vals.benchmark_pct}
+          updateField={updateField}
+        />
 
         <div
           style={{

@@ -1,10 +1,23 @@
 import { fmt } from "../lib/formatters.js";
 
-const BENCHMARK_RATE = 0.04;
+const rateInputStyle = {
+  background: "#0f172a",
+  border: "1px solid #334155",
+  borderRadius: "4px",
+  color: "#f1f5f9",
+  padding: "4px 8px",
+  width: "52px",
+  textAlign: "center",
+  fontSize: "12px",
+  fontFamily: "inherit",
+  minHeight: "28px",
+};
 
-export default function FixedReturnBenchmark({ totalInvested, holdYears }) {
+export default function FixedReturnBenchmark({ totalInvested, holdYears, benchmarkPct, updateField }) {
   const years = Math.max(Math.round(holdYears), 1);
-  const endingValue = totalInvested * Math.pow(1 + BENCHMARK_RATE, years);
+  const rate = Math.max(benchmarkPct, 0) / 100;
+  const rateLabel = benchmarkPct.toFixed(1).replace(/\.0$/, "");
+  const endingValue = totalInvested * Math.pow(1 + rate, years);
   const totalProfit = endingValue - totalInvested;
 
   return (
@@ -22,6 +35,10 @@ export default function FixedReturnBenchmark({ totalInvested, holdYears }) {
           background: "#0f172a",
           padding: "10px 16px",
           borderBottom: "1px solid #1e293b",
+          display: "flex",
+          alignItems: "center",
+          gap: "8px",
+          flexWrap: "wrap",
         }}
       >
         <span
@@ -32,12 +49,33 @@ export default function FixedReturnBenchmark({ totalInvested, holdYears }) {
             textTransform: "uppercase",
           }}
         >
-          {years}-Year Benchmark — {(BENCHMARK_RATE * 100).toFixed(0)}% Annual Return
+          {years}-Year Benchmark — High Yield Savings/CD for Comparison
+        </span>
+        <span
+          style={{
+            fontSize: "11px",
+            color: "#475569",
+            display: "inline-flex",
+            alignItems: "center",
+            gap: "4px",
+          }}
+          className="no-print"
+        >
+          <input
+            type="number"
+            value={benchmarkPct}
+            min={0}
+            max={20}
+            step={0.1}
+            onChange={(e) => updateField("benchmark_pct", Number(e.target.value))}
+            style={rateInputStyle}
+          />
+          <span>%/yr</span>
         </span>
       </div>
       <div style={{ padding: "20px 16px" }}>
         <div style={{ fontSize: "11px", color: "#475569", marginBottom: "2px" }}>
-          {(BENCHMARK_RATE * 100).toFixed(0)}%/yr on total cash invested
+          {rateLabel}%/yr compounded on total cash invested
         </div>
         <div
           style={{
@@ -47,7 +85,7 @@ export default function FixedReturnBenchmark({ totalInvested, holdYears }) {
             marginBottom: "16px",
           }}
         >
-          {(BENCHMARK_RATE * 100).toFixed(0)}% CAGR
+          {rateLabel}% CAGR
         </div>
         <div style={{ fontSize: "12px", color: "#64748b", lineHeight: "2" }}>
           <div style={{ display: "flex", justifyContent: "space-between" }}>
@@ -81,8 +119,8 @@ export default function FixedReturnBenchmark({ totalInvested, holdYears }) {
           color: "#475569",
         }}
       >
-        Simple comparison: total cash invested compounded at {(BENCHMARK_RATE * 100).toFixed(0)}% per
-        year for {years} years. No rent, appreciation, or transaction costs.
+        High yield savings / CD comparison: total cash invested compounded at {rateLabel}% per year
+        for {years} years. No rent, appreciation, or transaction costs.
       </div>
     </div>
   );

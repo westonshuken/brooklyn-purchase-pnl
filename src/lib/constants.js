@@ -10,6 +10,7 @@ export const numericDefaults = {
   mgmt_pct: 0,
   utilities: 0,
   other: 0,
+  benchmark_pct: 4,
 };
 
 export const stringDefaults = {
