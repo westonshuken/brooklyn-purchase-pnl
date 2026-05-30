@@ -12,6 +12,7 @@ import IncomeSection from "./IncomeSection.jsx";
 import ExpensesSection from "./ExpensesSection.jsx";
 import MetricsGrid from "./MetricsGrid.jsx";
 import ExitAnalysis from "./ExitAnalysis.jsx";
+import FixedReturnBenchmark from "./FixedReturnBenchmark.jsx";
 
 const buttonStyle = {
   background: "#0f172a",
@@ -149,6 +150,7 @@ export default function PNL() {
           holdYears={vals.hold_years}
           updateField={updateField}
         />
+        <FixedReturnBenchmark totalInvested={pnl.totalInvested} holdYears={vals.hold_years} />
 
         <div
           style={{
