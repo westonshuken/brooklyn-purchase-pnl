@@ -4,9 +4,10 @@ import {
   RENT_GROWTH_RATE,
   SELLING_COSTS,
   TAX_GROWTH_RATE,
+  CAP_GAINS_TAX_RATE,
 } from "../lib/constants.js";
 import { computeExitScenarios } from "../lib/calculations.js";
-import { fmt } from "../lib/formatters.js";
+import { fmt, taxOnProfit } from "../lib/formatters.js";
 
 const yearsInputStyle = {
   background: "#0f172a",
@@ -149,6 +150,29 @@ export default function ExitAnalysis({ vals, purchasePrice, holdYears, updateFie
                 <span style={rowLabelStyle}>Total profit</span>
                 <span className="exit-row-value" style={{ ...rowValueStyle, color: s.color, fontWeight: 600 }}>{fmt(s.totalReturn)}</span>
               </div>
+              {(() => {
+                const capGainsTax = taxOnProfit(s.totalReturn, CAP_GAINS_TAX_RATE);
+                const profitAfterTax = s.totalReturn - capGainsTax;
+                return (
+                  <>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
+                      <span style={rowLabelStyle}>Cap gains tax ({(CAP_GAINS_TAX_RATE * 100).toFixed(0)}%)</span>
+                      <span className="exit-row-value" style={{ ...rowValueStyle, color: "#f87171" }}>
+                        ({fmt(capGainsTax)})
+                      </span>
+                    </div>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
+                      <span style={{ ...rowLabelStyle, fontWeight: 600 }}>Net after tax</span>
+                      <span
+                        className="exit-row-value"
+                        style={{ ...rowValueStyle, color: s.color, fontWeight: 600 }}
+                      >
+                        {fmt(profitAfterTax)}
+                      </span>
+                    </div>
+                  </>
+                );
+              })()}
             </div>
           </div>
         ))}
@@ -162,7 +186,7 @@ export default function ExitAnalysis({ vals, purchasePrice, holdYears, updateFie
           color: "#475569",
         }}
       >
-        Buy costs ~1.4% (NYC mansion tax, title, attorney). Selling costs ~{sellCostPct}% (broker + transfer taxes). Exit cash flow: rent +{(RENT_GROWTH_RATE * 100).toFixed(0)}%/yr, property tax +{(TAX_GROWTH_RATE * 100).toFixed(0)}%/yr. IRR on total cash invested. Depreciation recapture &amp; cap gains tax not included.
+        Buy costs ~1.4% (NYC mansion tax, title, attorney). Selling costs ~{sellCostPct}% (broker + transfer taxes). Exit cash flow: rent +{(RENT_GROWTH_RATE * 100).toFixed(0)}%/yr, property tax +{(TAX_GROWTH_RATE * 100).toFixed(0)}%/yr. {(CAP_GAINS_TAX_RATE * 100).toFixed(0)}% LTCG tax on total profit (simplified). IRR on total cash invested before tax.
       </div>
     </div>
   );

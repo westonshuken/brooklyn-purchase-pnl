@@ -1,4 +1,5 @@
-import { fmt } from "../lib/formatters.js";
+import { ORDINARY_INCOME_TAX_RATE } from "../lib/constants.js";
+import { fmt, taxOnProfit } from "../lib/formatters.js";
 
 const rateInputStyle = {
   background: "#0f172a",
@@ -19,6 +20,8 @@ export default function FixedReturnBenchmark({ totalInvested, holdYears, benchma
   const rateLabel = benchmarkPct.toFixed(1).replace(/\.0$/, "");
   const endingValue = totalInvested * Math.pow(1 + rate, years);
   const totalProfit = endingValue - totalInvested;
+  const ordinaryTax = taxOnProfit(totalProfit, ORDINARY_INCOME_TAX_RATE);
+  const profitAfterTax = totalProfit - ordinaryTax;
 
   return (
     <div
@@ -113,6 +116,14 @@ export default function FixedReturnBenchmark({ totalInvested, holdYears, benchma
             <span>Total profit</span>
             <span style={{ color: "#a78bfa", fontWeight: 600 }}>{fmt(totalProfit)}</span>
           </div>
+          <div style={{ display: "flex", justifyContent: "space-between" }}>
+            <span>Ordinary income tax ({(ORDINARY_INCOME_TAX_RATE * 100).toFixed(0)}%)</span>
+            <span style={{ color: "#f87171" }}>({fmt(ordinaryTax)})</span>
+          </div>
+          <div style={{ display: "flex", justifyContent: "space-between" }}>
+            <span style={{ fontWeight: 600 }}>Net after tax</span>
+            <span style={{ color: "#a78bfa", fontWeight: 600 }}>{fmt(profitAfterTax)}</span>
+          </div>
         </div>
       </div>
       <div
@@ -125,7 +136,8 @@ export default function FixedReturnBenchmark({ totalInvested, holdYears, benchma
         }}
       >
         High yield savings / CD comparison: total cash invested compounded at {rateLabel}% per year
-        for {years} years. No rent, appreciation, or transaction costs.
+        for {years} years. {(ORDINARY_INCOME_TAX_RATE * 100).toFixed(0)}% ordinary income tax on profit
+        (simplified). No rent, appreciation, or transaction costs.
       </div>
     </div>
   );
