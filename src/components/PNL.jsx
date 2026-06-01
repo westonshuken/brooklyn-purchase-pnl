@@ -150,6 +150,7 @@ export default function PNL() {
           vals={vals}
           purchasePrice={vals.purchase_price}
           holdYears={vals.hold_years}
+          appreciationPct={vals.appreciation_pct}
           updateField={updateField}
         />
         <FixedReturnBenchmark

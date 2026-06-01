@@ -1,5 +1,4 @@
 import {
-  EXIT_SCENARIOS,
   ORDINARY_INCOME_TAX_RATE,
   RENT_GROWTH_RATE,
   TAX_GROWTH_RATE,
@@ -33,8 +32,12 @@ function plColor(n) {
 }
 
 export default function AnnualBreakdownTable({ vals, holdYears }) {
-  const baseAppr = EXIT_SCENARIOS[1].appr;
-  const { rows, totalInvested, appreciationRate } = computeAnnualBreakdown(vals, holdYears, baseAppr);
+  const appreciationRate = Math.max(vals.appreciation_pct, 0) / 100;
+  const { rows, totalInvested, appreciationRate: appr } = computeAnnualBreakdown(
+    vals,
+    holdYears,
+    appreciationRate
+  );
 
   if (rows.length === 0) return null;
 
@@ -67,7 +70,7 @@ export default function AnnualBreakdownTable({ vals, holdYears }) {
           Year-by-Year Return
         </span>
         <span style={{ fontSize: "11px", color: "#475569", marginLeft: "8px" }}>
-          · base case {(appreciationRate * 100).toFixed(0)}% appr · rent +{(RENT_GROWTH_RATE * 100).toFixed(0)}%/yr · tax +{(TAX_GROWTH_RATE * 100).toFixed(0)}%/yr
+          · {(appr * 100).toFixed(1).replace(/\.0$/, "")}% appr · rent +{(RENT_GROWTH_RATE * 100).toFixed(0)}%/yr · tax +{(TAX_GROWTH_RATE * 100).toFixed(0)}%/yr
         </span>
       </div>
       <div className="annual-table-wrap" style={{ overflowX: "auto" }}>
@@ -116,8 +119,8 @@ export default function AnnualBreakdownTable({ vals, holdYears }) {
         }}
       >
         Return % = year P/L ÷ total cash invested ({fmt(totalInvested)}). After-tax cash flow uses{" "}
-        {(ORDINARY_INCOME_TAX_RATE * 100).toFixed(0)}% on positive rent income. Appr. gain is unrealized
-        (base case). Does not include sell costs or {(15).toFixed(0)}% LTCG until exit.
+        {(ORDINARY_INCOME_TAX_RATE * 100).toFixed(0)}% on positive rent income. Appr. gain is unrealized.
+        Does not include sell costs or {(15).toFixed(0)}% LTCG until exit.
       </div>
     </div>
   );

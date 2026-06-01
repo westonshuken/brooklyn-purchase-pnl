@@ -1,5 +1,4 @@
 import {
-  EXIT_SCENARIOS,
   BUYING_COSTS,
   RENT_GROWTH_RATE,
   SELLING_COSTS,
@@ -7,10 +6,10 @@ import {
   CAP_GAINS_TAX_RATE,
   ORDINARY_INCOME_TAX_RATE,
 } from "../lib/constants.js";
-import { computeExitScenarios } from "../lib/calculations.js";
+import { computeExitAnalysis } from "../lib/calculations.js";
 import { computeExitTaxes, fmt } from "../lib/formatters.js";
 
-const yearsInputStyle = {
+const inputStyle = {
   background: "#0f172a",
   border: "1px solid #334155",
   borderRadius: "4px",
@@ -25,11 +24,15 @@ const yearsInputStyle = {
 
 const rowLabelStyle = { whiteSpace: "nowrap", flexShrink: 0 };
 const rowValueStyle = { whiteSpace: "nowrap", textAlign: "right", marginLeft: "8px" };
+const accentColor = "#60a5fa";
 
-export default function ExitAnalysis({ vals, purchasePrice, holdYears, updateField }) {
+export default function ExitAnalysis({ vals, purchasePrice, holdYears, appreciationPct, updateField }) {
   const years = Math.max(Math.round(holdYears), 1);
-  const scenarios = computeExitScenarios(vals, purchasePrice, EXIT_SCENARIOS, years);
+  const s = computeExitAnalysis(vals, purchasePrice, years, appreciationPct);
   const sellCostPct = (SELLING_COSTS * 100).toFixed(2);
+  const apprLabel = appreciationPct.toFixed(1).replace(/\.0$/, "");
+  const { capGainsTax, ordinaryTax, totalTax } = computeExitTaxes(s.netSaleProceeds, s.totalRentalIncome);
+  const profitAfterTax = s.totalReturn - totalTax;
 
   return (
     <div
@@ -62,7 +65,7 @@ export default function ExitAnalysis({ vals, purchasePrice, holdYears, updateFie
         >
           {years}-Year Total Return
         </span>
-        <span style={{ fontSize: "11px", color: "#475569", display: "inline-flex", alignItems: "center", gap: "6px" }}>
+        <span style={{ fontSize: "11px", color: "#475569", display: "inline-flex", alignItems: "center", gap: "6px", flexWrap: "wrap" }}>
           <span className="no-print">all-cash · hold</span>
           <input
             type="number"
@@ -74,118 +77,88 @@ export default function ExitAnalysis({ vals, purchasePrice, holdYears, updateFie
               const next = Math.min(30, Math.max(1, Number(e.target.value) || 1));
               updateField("hold_years", next);
             }}
-            style={yearsInputStyle}
+            style={inputStyle}
+            className="no-print"
+          />
+          <span className="no-print">yr · appr</span>
+          <input
+            type="number"
+            value={appreciationPct}
+            min={0}
+            max={20}
+            step={0.5}
+            onChange={(e) => updateField("appreciation_pct", Number(e.target.value))}
+            style={inputStyle}
             className="no-print"
           />
           <span style={{ whiteSpace: "nowrap" }}>
-            {years} yr hold · sell yr {years} · rent +{(RENT_GROWTH_RATE * 100).toFixed(0)}%/yr · tax +{(TAX_GROWTH_RATE * 100).toFixed(0)}%/yr
+            {years} yr · {apprLabel}%/yr appr · rent +{(RENT_GROWTH_RATE * 100).toFixed(0)}%/yr · tax +{(TAX_GROWTH_RATE * 100).toFixed(0)}%/yr
           </span>
         </span>
       </div>
-      <div className="exit-grid exit-grid-inner">
-        {scenarios.map((s, i) => (
+      <div style={{ padding: "20px 16px", maxWidth: "420px" }}>
+        <div style={{ fontSize: "11px", color: "#475569", marginBottom: "2px" }}>
+          {apprLabel}%/yr appreciation
+        </div>
+        <div
+          style={{
+            fontSize: "22px",
+            fontWeight: 700,
+            color: accentColor,
+            marginBottom: "16px",
+          }}
+        >
+          {s.annualized.toFixed(1)}% IRR
+        </div>
+        <div style={{ fontSize: "12px", color: "#64748b", lineHeight: "2" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
+            <span style={rowLabelStyle}>Buy costs ({(BUYING_COSTS * 100).toFixed(1)}%)</span>
+            <span className="exit-row-value" style={{ ...rowValueStyle, color: "#f87171" }}>({fmt(s.buyingCosts)})</span>
+          </div>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
+            <span style={rowLabelStyle}>Sale price</span>
+            <span className="exit-row-value" style={{ ...rowValueStyle, color: "#94a3b8" }}>{fmt(s.salePrice)}</span>
+          </div>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
+            <span style={rowLabelStyle}>Sell costs ({sellCostPct}%)</span>
+            <span className="exit-row-value" style={{ ...rowValueStyle, color: "#f87171" }}>({fmt(s.sellCosts)})</span>
+          </div>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
+            <span style={rowLabelStyle}>Appr. gain</span>
+            <span className="exit-row-value" style={{ ...rowValueStyle, color: "#94a3b8" }}>{fmt(s.netSaleProceeds)}</span>
+          </div>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
+            <span style={rowLabelStyle}>Cash flow ({years}yr)</span>
+            <span className="exit-row-value" style={{ ...rowValueStyle, color: "#94a3b8" }}>{fmt(s.totalRentalIncome)}</span>
+          </div>
           <div
-            key={s.label}
-            className="exit-scenario"
             style={{
-              padding: "20px 16px",
-              borderRight: i < 2 ? "1px solid #1e293b" : "none",
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "baseline",
+              borderTop: "1px solid #1e293b",
+              paddingTop: "4px",
+              marginTop: "2px",
             }}
           >
-            <div
-              style={{
-                fontSize: "11px",
-                color: s.color,
-                textTransform: "uppercase",
-                letterSpacing: "1.5px",
-                marginBottom: "12px",
-                fontWeight: 600,
-              }}
-            >
-              {s.label}
-            </div>
-            <div style={{ fontSize: "11px", color: "#475569", marginBottom: "2px" }}>
-              {(s.appr * 100).toFixed(0)}%/yr appreciation
-            </div>
-            <div
-              style={{
-                fontSize: "22px",
-                fontWeight: 700,
-                color: s.color,
-                marginBottom: "16px",
-              }}
-            >
-              {s.annualized.toFixed(1)}% IRR
-            </div>
-            <div style={{ fontSize: "12px", color: "#64748b", lineHeight: "2" }}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
-                <span style={rowLabelStyle}>Buy costs ({(BUYING_COSTS * 100).toFixed(1)}%)</span>
-                <span className="exit-row-value" style={{ ...rowValueStyle, color: "#f87171" }}>({fmt(s.buyingCosts)})</span>
-              </div>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
-                <span style={rowLabelStyle}>Sale price</span>
-                <span className="exit-row-value" style={{ ...rowValueStyle, color: "#94a3b8" }}>{fmt(s.salePrice)}</span>
-              </div>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
-                <span style={rowLabelStyle}>Sell costs ({sellCostPct}%)</span>
-                <span className="exit-row-value" style={{ ...rowValueStyle, color: "#f87171" }}>({fmt(s.sellCosts)})</span>
-              </div>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
-                <span style={rowLabelStyle}>Appr. gain</span>
-                <span className="exit-row-value" style={{ ...rowValueStyle, color: "#94a3b8" }}>{fmt(s.netSaleProceeds)}</span>
-              </div>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
-                <span style={rowLabelStyle}>Cash flow ({years}yr)</span>
-                <span className="exit-row-value" style={{ ...rowValueStyle, color: "#94a3b8" }}>{fmt(s.totalRentalIncome)}</span>
-              </div>
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "baseline",
-                  borderTop: "1px solid #1e293b",
-                  paddingTop: "4px",
-                  marginTop: "2px",
-                }}
-              >
-                <span style={rowLabelStyle}>Total profit</span>
-                <span className="exit-row-value" style={{ ...rowValueStyle, color: s.color, fontWeight: 600 }}>{fmt(s.totalReturn)}</span>
-              </div>
-              {(() => {
-                const { capGainsTax, ordinaryTax, totalTax } = computeExitTaxes(
-                  s.netSaleProceeds,
-                  s.totalRentalIncome
-                );
-                const profitAfterTax = s.totalReturn - totalTax;
-                return (
-                  <>
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
-                      <span style={rowLabelStyle}>Cap gains tax ({(CAP_GAINS_TAX_RATE * 100).toFixed(0)}%)</span>
-                      <span className="exit-row-value" style={{ ...rowValueStyle, color: "#f87171" }}>
-                        ({fmt(capGainsTax)})
-                      </span>
-                    </div>
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
-                      <span style={rowLabelStyle}>Income tax ({(ORDINARY_INCOME_TAX_RATE * 100).toFixed(0)}%)</span>
-                      <span className="exit-row-value" style={{ ...rowValueStyle, color: "#f87171" }}>
-                        ({fmt(ordinaryTax)})
-                      </span>
-                    </div>
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
-                      <span style={{ ...rowLabelStyle, fontWeight: 600 }}>Net after tax</span>
-                      <span
-                        className="exit-row-value"
-                        style={{ ...rowValueStyle, color: s.color, fontWeight: 600 }}
-                      >
-                        {fmt(profitAfterTax)}
-                      </span>
-                    </div>
-                  </>
-                );
-              })()}
-            </div>
+            <span style={rowLabelStyle}>Total profit</span>
+            <span className="exit-row-value" style={{ ...rowValueStyle, color: accentColor, fontWeight: 600 }}>{fmt(s.totalReturn)}</span>
           </div>
-        ))}
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
+            <span style={rowLabelStyle}>Cap gains tax ({(CAP_GAINS_TAX_RATE * 100).toFixed(0)}%)</span>
+            <span className="exit-row-value" style={{ ...rowValueStyle, color: "#f87171" }}>({fmt(capGainsTax)})</span>
+          </div>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
+            <span style={rowLabelStyle}>Income tax ({(ORDINARY_INCOME_TAX_RATE * 100).toFixed(0)}%)</span>
+            <span className="exit-row-value" style={{ ...rowValueStyle, color: "#f87171" }}>({fmt(ordinaryTax)})</span>
+          </div>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
+            <span style={{ ...rowLabelStyle, fontWeight: 600 }}>Net after tax</span>
+            <span className="exit-row-value" style={{ ...rowValueStyle, color: accentColor, fontWeight: 600 }}>
+              {fmt(profitAfterTax)}
+            </span>
+          </div>
+        </div>
       </div>
       <div
         style={{

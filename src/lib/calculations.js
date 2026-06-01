@@ -78,37 +78,34 @@ export function computeTotalCashFlowOverHold(vals, years) {
   return total;
 }
 
-export function computeExitScenarios(vals, purchasePrice, scenarios, years) {
+export function computeExitAnalysis(vals, purchasePrice, years, appreciationPct) {
   const { purchasePrice: price, buyingCosts, totalInvested } = getInvestment(purchasePrice);
   const holdYears = Math.max(Math.round(years), 1);
   const invested = totalInvested > 0 ? totalInvested : 1;
+  const appr = Math.max(appreciationPct, 0) / 100;
 
-  return scenarios.map((s) => {
-    const salePrice = price * Math.pow(1 + s.appr, holdYears);
-    const sellCosts = salePrice * SELLING_COSTS;
-    const netSaleProceeds = salePrice - sellCosts - price;
-    const totalRentalIncome = computeTotalCashFlowOverHold(vals, holdYears);
-    const totalReturn = salePrice - sellCosts - totalInvested + totalRentalIncome;
-    const endingValue = salePrice - sellCosts + totalRentalIncome;
-    const annualized =
-      totalInvested > 0
-        ? (Math.pow(endingValue / invested, 1 / holdYears) - 1) * 100
-        : 0;
+  const salePrice = price * Math.pow(1 + appr, holdYears);
+  const sellCosts = salePrice * SELLING_COSTS;
+  const netSaleProceeds = salePrice - sellCosts - price;
+  const totalRentalIncome = computeTotalCashFlowOverHold(vals, holdYears);
+  const totalReturn = salePrice - sellCosts - totalInvested + totalRentalIncome;
+  const endingValue = salePrice - sellCosts + totalRentalIncome;
+  const annualized =
+    totalInvested > 0 ? (Math.pow(endingValue / invested, 1 / holdYears) - 1) * 100 : 0;
 
-    return {
-      ...s,
-      salePrice,
-      sellCosts,
-      buyingCosts,
-      netSaleProceeds,
-      totalRentalIncome,
-      totalReturn,
-      totalInvested,
-      annualized,
-      annualizedLabel: pct(annualized),
-      holdYears,
-    };
-  });
+  return {
+    appr,
+    salePrice,
+    sellCosts,
+    buyingCosts,
+    netSaleProceeds,
+    totalRentalIncome,
+    totalReturn,
+    totalInvested,
+    annualized,
+    annualizedLabel: pct(annualized),
+    holdYears,
+  };
 }
 
 export function buildMetrics(pnl) {

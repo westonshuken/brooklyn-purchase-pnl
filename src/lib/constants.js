@@ -11,6 +11,7 @@ export const numericDefaults = {
   utilities: 0,
   other: 0,
   benchmark_pct: 4,
+  appreciation_pct: 5,
 };
 
 export const stringDefaults = {
@@ -30,12 +31,6 @@ export const RENT_GROWTH_RATE = 0.03;
 export const TAX_GROWTH_RATE = 0.05;
 export const CAP_GAINS_TAX_RATE = 0.15;
 export const ORDINARY_INCOME_TAX_RATE = 0.3;
-
-export const EXIT_SCENARIOS = [
-  { label: "Conservative", appr: 0.03, color: "#94a3b8", accent: "#334155" },
-  { label: "Base Case", appr: 0.05, color: "#60a5fa", accent: "#1e3a5f" },
-  { label: "Optimistic", appr: 0.07, color: "#4ade80", accent: "#166534" },
-];
 
 export const EXPENSE_ITEMS = [
   { label: "Property Tax", key: "prop_tax", step: 50 },
