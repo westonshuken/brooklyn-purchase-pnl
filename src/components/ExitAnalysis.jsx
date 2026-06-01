@@ -1,4 +1,10 @@
-import { EXIT_SCENARIOS, BUYING_COSTS, RENT_GROWTH_RATE, SELLING_COSTS } from "../lib/constants.js";
+import {
+  EXIT_SCENARIOS,
+  BUYING_COSTS,
+  RENT_GROWTH_RATE,
+  SELLING_COSTS,
+  TAX_GROWTH_RATE,
+} from "../lib/constants.js";
 import { computeExitScenarios } from "../lib/calculations.js";
 import { fmt } from "../lib/formatters.js";
 
@@ -15,9 +21,13 @@ const yearsInputStyle = {
   minHeight: "28px",
 };
 
-export default function ExitAnalysis({ annualCf, purchasePrice, holdYears, updateField }) {
+const rowLabelStyle = { whiteSpace: "nowrap", flexShrink: 0 };
+const rowValueStyle = { whiteSpace: "nowrap", textAlign: "right", marginLeft: "8px" };
+
+export default function ExitAnalysis({ vals, purchasePrice, holdYears, updateField }) {
   const years = Math.max(Math.round(holdYears), 1);
-  const scenarios = computeExitScenarios(annualCf, purchasePrice, EXIT_SCENARIOS, years);
+  const scenarios = computeExitScenarios(vals, purchasePrice, EXIT_SCENARIOS, years);
+  const sellCostPct = (SELLING_COSTS * 100).toFixed(2);
 
   return (
     <div
@@ -65,8 +75,8 @@ export default function ExitAnalysis({ annualCf, purchasePrice, holdYears, updat
             style={yearsInputStyle}
             className="no-print"
           />
-          <span>
-            {years} year hold · sell at year {years} · rent +{(RENT_GROWTH_RATE * 100).toFixed(0)}%/yr
+          <span style={{ whiteSpace: "nowrap" }}>
+            {years} yr hold · sell yr {years} · rent +{(RENT_GROWTH_RATE * 100).toFixed(0)}%/yr · tax +{(TAX_GROWTH_RATE * 100).toFixed(0)}%/yr
           </span>
         </span>
       </div>
@@ -113,37 +123,38 @@ export default function ExitAnalysis({ annualCf, purchasePrice, holdYears, updat
               {s.annualized.toFixed(1)}% IRR
             </div>
             <div style={{ fontSize: "12px", color: "#64748b", lineHeight: "2" }}>
-              <div style={{ display: "flex", justifyContent: "space-between" }}>
-                <span>Buy costs ({(BUYING_COSTS * 100).toFixed(1)}%)</span>
-                <span style={{ color: "#f87171" }}>({fmt(s.buyingCosts)})</span>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
+                <span style={rowLabelStyle}>Buy costs ({(BUYING_COSTS * 100).toFixed(1)}%)</span>
+                <span style={{ ...rowValueStyle, color: "#f87171" }}>({fmt(s.buyingCosts)})</span>
               </div>
-              <div style={{ display: "flex", justifyContent: "space-between" }}>
-                <span>Sale price</span>
-                <span style={{ color: "#94a3b8" }}>{fmt(s.salePrice)}</span>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
+                <span style={rowLabelStyle}>Sale price</span>
+                <span style={{ ...rowValueStyle, color: "#94a3b8" }}>{fmt(s.salePrice)}</span>
               </div>
-              <div style={{ display: "flex", justifyContent: "space-between" }}>
-                <span>Sell costs ({(SELLING_COSTS * 100).toFixed(2)}%)</span>
-                <span style={{ color: "#f87171" }}>({fmt(s.sellCosts)})</span>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
+                <span style={rowLabelStyle}>Sell costs ({sellCostPct}%)</span>
+                <span style={{ ...rowValueStyle, color: "#f87171" }}>({fmt(s.sellCosts)})</span>
               </div>
-              <div style={{ display: "flex", justifyContent: "space-between" }}>
-                <span>Appr. gain</span>
-                <span style={{ color: "#94a3b8" }}>{fmt(s.netSaleProceeds)}</span>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
+                <span style={rowLabelStyle}>Appr. gain</span>
+                <span style={{ ...rowValueStyle, color: "#94a3b8" }}>{fmt(s.netSaleProceeds)}</span>
               </div>
-              <div style={{ display: "flex", justifyContent: "space-between" }}>
-                <span>Rent ({years}yr, +{(RENT_GROWTH_RATE * 100).toFixed(0)}%/yr)</span>
-                <span style={{ color: "#94a3b8" }}>{fmt(s.totalRentalIncome)}</span>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
+                <span style={rowLabelStyle}>Cash flow ({years}yr)</span>
+                <span style={{ ...rowValueStyle, color: "#94a3b8" }}>{fmt(s.totalRentalIncome)}</span>
               </div>
               <div
                 style={{
                   display: "flex",
                   justifyContent: "space-between",
+                  alignItems: "baseline",
                   borderTop: "1px solid #1e293b",
                   paddingTop: "4px",
                   marginTop: "2px",
                 }}
               >
-                <span>Total profit</span>
-                <span style={{ color: s.color, fontWeight: 600 }}>{fmt(s.totalReturn)}</span>
+                <span style={rowLabelStyle}>Total profit</span>
+                <span style={{ ...rowValueStyle, color: s.color, fontWeight: 600 }}>{fmt(s.totalReturn)}</span>
               </div>
             </div>
           </div>
@@ -158,11 +169,7 @@ export default function ExitAnalysis({ annualCf, purchasePrice, holdYears, updat
           color: "#475569",
         }}
       >
-        Buy costs ~1.4% (NYC mansion tax, title, attorney). Selling costs ~
-        {(SELLING_COSTS * 100).toFixed(2)}% (broker + transfer taxes). Cumulative rent assumes{" "}
-        {(RENT_GROWTH_RATE * 100).toFixed(0)}% annual growth on
-        year-1 cash flow. IRR based on total cash invested. Depreciation recapture &amp; cap gains
-        tax not included.
+        Buy costs ~1.4% (NYC mansion tax, title, attorney). Selling costs ~{sellCostPct}% (broker + transfer taxes). Exit cash flow: rent +{(RENT_GROWTH_RATE * 100).toFixed(0)}%/yr, property tax +{(TAX_GROWTH_RATE * 100).toFixed(0)}%/yr. IRR on total cash invested. Depreciation recapture &amp; cap gains tax not included.
       </div>
     </div>
   );

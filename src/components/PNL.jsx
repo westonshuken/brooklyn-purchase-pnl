@@ -4,6 +4,7 @@ import {
   RENT_GROWTH_RATE,
   REPORT_TITLE,
   SELLING_COSTS,
+  TAX_GROWTH_RATE,
 } from "../lib/constants.js";
 import { buildMetrics, computePNL } from "../lib/calculations.js";
 import ListingSection from "./ListingSection.jsx";
@@ -145,7 +146,7 @@ export default function PNL() {
 
         <MetricsGrid metrics={metrics} />
         <ExitAnalysis
-          annualCf={pnl.annual_cf}
+          vals={vals}
           purchasePrice={vals.purchase_price}
           holdYears={vals.hold_years}
           updateField={updateField}
@@ -184,7 +185,7 @@ export default function PNL() {
           <div>• Buy costs {(BUYING_COSTS * 100).toFixed(1)}% included in cap rate, cash-on-cash, and exit IRR</div>
           <div>• Selling costs {(SELLING_COSTS * 100).toFixed(2)}% applied at exit (broker + transfer taxes)</div>
           <div>• Rent and operating expenses entered as monthly amounts</div>
-          <div>• Exit rent grows {(RENT_GROWTH_RATE * 100).toFixed(0)}% per year on year-1 cash flow</div>
+          <div>• Exit model: rent +{(RENT_GROWTH_RATE * 100).toFixed(0)}%/yr, property tax +{(TAX_GROWTH_RATE * 100).toFixed(0)}%/yr</div>
           <div>• Cap rate and cash-on-cash based on total cash invested</div>
           <div>• Does not include depreciation, income tax, or cap gains tax</div>
         </div>

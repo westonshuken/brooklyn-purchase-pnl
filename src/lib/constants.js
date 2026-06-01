@@ -27,6 +27,7 @@ export const STORAGE_KEY = "brooklyn-purchase-pnl-v1";
 export const SELLING_COSTS = 0.0683;
 export const BUYING_COSTS = 0.014;
 export const RENT_GROWTH_RATE = 0.03;
+export const TAX_GROWTH_RATE = 0.05;
 
 export const EXIT_SCENARIOS = [
   { label: "Conservative", appr: 0.03, color: "#94a3b8", accent: "#334155" },

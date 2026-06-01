@@ -38,7 +38,8 @@ export default function FixedReturnBenchmark({ totalInvested, holdYears, benchma
           display: "flex",
           alignItems: "center",
           gap: "8px",
-          flexWrap: "wrap",
+          flexWrap: "nowrap",
+          overflowX: "auto",
         }}
       >
         <span
@@ -47,9 +48,11 @@ export default function FixedReturnBenchmark({ totalInvested, holdYears, benchma
             letterSpacing: "2px",
             color: "#a78bfa",
             textTransform: "uppercase",
+            whiteSpace: "nowrap",
+            flexShrink: 0,
           }}
         >
-          {years}-Year Benchmark — High Yield Savings/CD for Comparison
+          {years}-Year Benchmark — High Yield Savings/CD
         </span>
         <span
           style={{
@@ -58,6 +61,8 @@ export default function FixedReturnBenchmark({ totalInvested, holdYears, benchma
             display: "inline-flex",
             alignItems: "center",
             gap: "4px",
+            whiteSpace: "nowrap",
+            flexShrink: 0,
           }}
           className="no-print"
         >

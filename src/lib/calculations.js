@@ -1,4 +1,4 @@
-import { BUYING_COSTS, RENT_GROWTH_RATE, SELLING_COSTS } from "./constants.js";
+import { BUYING_COSTS, RENT_GROWTH_RATE, SELLING_COSTS, TAX_GROWTH_RATE } from "./constants.js";
 import { pct } from "./formatters.js";
 
 export function getInvestment(purchasePrice) {
@@ -52,19 +52,33 @@ export function computePNL(vals) {
   };
 }
 
-/** Sum annual cash flow over hold period with compounding rent growth each year. */
-export function computeTotalRentalIncome(annualCf, years, growthRate = RENT_GROWTH_RATE) {
-  const holdYears = Math.max(Math.round(years), 1);
-  if (growthRate === 0) return annualCf * holdYears;
+/** Annual cash flow for a given hold year (0 = year 1). Rent +3%/yr; property tax +5%/yr. */
+export function computeAnnualCashFlowForYear(vals, yearIndex) {
+  const rentGrowth = Math.pow(1 + RENT_GROWTH_RATE, yearIndex);
+  const taxGrowth = Math.pow(1 + TAX_GROWTH_RATE, yearIndex);
 
+  const gross_rent_annual = vals.rent * 12 * rentGrowth;
+  const vacancy_loss_annual = gross_rent_annual * (vals.vacancy_pct / 100);
+  const effective_rent_annual = gross_rent_annual - vacancy_loss_annual;
+  const mgmt_annual = effective_rent_annual * (vals.mgmt_pct / 100);
+  const tax_annual = vals.prop_tax * 12 * taxGrowth;
+  const fixed_opex_annual =
+    (vals.hoa + vals.insurance + vals.maintenance + vals.utilities + vals.other) * 12;
+
+  return effective_rent_annual - mgmt_annual - tax_annual - fixed_opex_annual;
+}
+
+/** Sum annual cash flow over hold with rent +3%/yr and property tax +5%/yr. */
+export function computeTotalCashFlowOverHold(vals, years) {
+  const holdYears = Math.max(Math.round(years), 1);
   let total = 0;
   for (let y = 0; y < holdYears; y++) {
-    total += annualCf * Math.pow(1 + growthRate, y);
+    total += computeAnnualCashFlowForYear(vals, y);
   }
   return total;
 }
 
-export function computeExitScenarios(annualCf, purchasePrice, scenarios, years) {
+export function computeExitScenarios(vals, purchasePrice, scenarios, years) {
   const { purchasePrice: price, buyingCosts, totalInvested } = getInvestment(purchasePrice);
   const holdYears = Math.max(Math.round(years), 1);
   const invested = totalInvested > 0 ? totalInvested : 1;
@@ -73,7 +87,7 @@ export function computeExitScenarios(annualCf, purchasePrice, scenarios, years) 
     const salePrice = price * Math.pow(1 + s.appr, holdYears);
     const sellCosts = salePrice * SELLING_COSTS;
     const netSaleProceeds = salePrice - sellCosts - price;
-    const totalRentalIncome = computeTotalRentalIncome(annualCf, holdYears);
+    const totalRentalIncome = computeTotalCashFlowOverHold(vals, holdYears);
     const totalReturn = salePrice - sellCosts - totalInvested + totalRentalIncome;
     const endingValue = salePrice - sellCosts + totalRentalIncome;
     const annualized =
