@@ -182,7 +182,7 @@ export default function PNL() {
           </div>
           <div>• All-cash purchase — no mortgage or debt service</div>
           <div>• Buy costs {(BUYING_COSTS * 100).toFixed(1)}% included in cap rate, cash-on-cash, and exit IRR</div>
-          <div>• Selling costs {(SELLING_COSTS * 100).toFixed(0)}% applied at exit (broker + transfer taxes)</div>
+          <div>• Selling costs {(SELLING_COSTS * 100).toFixed(2)}% applied at exit (broker + transfer taxes)</div>
           <div>• Rent and operating expenses entered as monthly amounts</div>
           <div>• Exit rent grows {(RENT_GROWTH_RATE * 100).toFixed(0)}% per year on year-1 cash flow</div>
           <div>• Cap rate and cash-on-cash based on total cash invested</div>

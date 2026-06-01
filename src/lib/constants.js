@@ -24,7 +24,7 @@ export const STRING_KEYS = Object.keys(stringDefaults);
 
 export const STORAGE_KEY = "brooklyn-purchase-pnl-v1";
 
-export const SELLING_COSTS = 0.06;
+export const SELLING_COSTS = 0.0683;
 export const BUYING_COSTS = 0.014;
 export const RENT_GROWTH_RATE = 0.03;
 

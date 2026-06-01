@@ -122,7 +122,7 @@ export default function ExitAnalysis({ annualCf, purchasePrice, holdYears, updat
                 <span style={{ color: "#94a3b8" }}>{fmt(s.salePrice)}</span>
               </div>
               <div style={{ display: "flex", justifyContent: "space-between" }}>
-                <span>Sell costs ({(SELLING_COSTS * 100).toFixed(0)}%)</span>
+                <span>Sell costs ({(SELLING_COSTS * 100).toFixed(2)}%)</span>
                 <span style={{ color: "#f87171" }}>({fmt(s.sellCosts)})</span>
               </div>
               <div style={{ display: "flex", justifyContent: "space-between" }}>
@@ -158,8 +158,9 @@ export default function ExitAnalysis({ annualCf, purchasePrice, holdYears, updat
           color: "#475569",
         }}
       >
-        Buy costs ~1.4% (NYC mansion tax, title, attorney). Selling costs ~6% (broker + transfer
-        taxes). Cumulative rent assumes {(RENT_GROWTH_RATE * 100).toFixed(0)}% annual growth on
+        Buy costs ~1.4% (NYC mansion tax, title, attorney). Selling costs ~
+        {(SELLING_COSTS * 100).toFixed(2)}% (broker + transfer taxes). Cumulative rent assumes{" "}
+        {(RENT_GROWTH_RATE * 100).toFixed(0)}% annual growth on
         year-1 cash flow. IRR based on total cash invested. Depreciation recapture &amp; cap gains
         tax not included.
       </div>
