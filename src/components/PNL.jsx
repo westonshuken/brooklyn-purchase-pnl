@@ -14,6 +14,7 @@ import ExpensesSection from "./ExpensesSection.jsx";
 import MetricsGrid from "./MetricsGrid.jsx";
 import ExitAnalysis from "./ExitAnalysis.jsx";
 import FixedReturnBenchmark from "./FixedReturnBenchmark.jsx";
+import AnnualBreakdownTable from "./AnnualBreakdownTable.jsx";
 
 const buttonStyle = {
   background: "#0f172a",
@@ -228,6 +229,8 @@ export default function PNL() {
             cap rate; in this all-cash model both use the same inputs, so they show the same number.
           </div>
         </div>
+
+        <AnnualBreakdownTable vals={vals} holdYears={vals.hold_years} />
 
         <p
           style={{

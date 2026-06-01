@@ -1,5 +1,5 @@
-import { BUYING_COSTS, RENT_GROWTH_RATE, SELLING_COSTS, TAX_GROWTH_RATE } from "./constants.js";
-import { pct } from "./formatters.js";
+import { BUYING_COSTS, ORDINARY_INCOME_TAX_RATE, RENT_GROWTH_RATE, SELLING_COSTS, TAX_GROWTH_RATE } from "./constants.js";
+import { pct, taxOnProfit } from "./formatters.js";
 
 export function getInvestment(purchasePrice) {
   const price = Math.max(purchasePrice, 0);
@@ -119,4 +119,39 @@ export function buildMetrics(pnl) {
     { label: "Cash-on-Cash Return", value: pct(pnl.coc), neutral: true },
     { label: "Break-even Rent", value: pnl.break_even_rent, neutral: true, isCurrency: true },
   ];
+}
+
+/** Year-by-year P/L using base-case appreciation, rent/tax growth, and 30% tax on cash flow. */
+export function computeAnnualBreakdown(vals, holdYears, appreciationRate = 0.05) {
+  const { purchasePrice, totalInvested } = getInvestment(vals.purchase_price);
+  const years = Math.max(Math.round(holdYears), 1);
+  const rows = [];
+  let cumulativePl = 0;
+
+  for (let y = 1; y <= years; y++) {
+    const cashFlow = computeAnnualCashFlowForYear(vals, y - 1);
+    const incomeTax = taxOnProfit(cashFlow, ORDINARY_INCOME_TAX_RATE);
+    const afterTaxCf = cashFlow - incomeTax;
+
+    const prevValue = purchasePrice * Math.pow(1 + appreciationRate, y - 1);
+    const propertyValue = purchasePrice * Math.pow(1 + appreciationRate, y);
+    const annualApprGain = propertyValue - prevValue;
+
+    const yearPl = afterTaxCf + annualApprGain;
+    cumulativePl += yearPl;
+
+    rows.push({
+      year: y,
+      cashFlow,
+      afterTaxCf,
+      annualApprGain,
+      yearPl,
+      returnPct: totalInvested > 0 ? (yearPl / totalInvested) * 100 : 0,
+      cumulativePl,
+      cumReturnPct: totalInvested > 0 ? (cumulativePl / totalInvested) * 100 : 0,
+      propertyValue,
+    });
+  }
+
+  return { rows, totalInvested, appreciationRate };
 }
