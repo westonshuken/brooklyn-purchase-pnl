@@ -187,7 +187,7 @@ export default function PNL() {
           <div>• Rent and operating expenses entered as monthly amounts</div>
           <div>• Exit model: rent +{(RENT_GROWTH_RATE * 100).toFixed(0)}%/yr, property tax +{(TAX_GROWTH_RATE * 100).toFixed(0)}%/yr</div>
           <div>• Cap rate and cash-on-cash based on total cash invested</div>
-          <div>• Exit: 15% LTCG on total profit; CD/HYS: 30% ordinary income tax (simplified)</div>
+          <div>• Exit: 15% LTCG on appr. gain, 30% ordinary income tax on cash flow; CD/HYS: 30% on profit</div>
           <div>• Does not include depreciation or detailed federal/state tax treatment</div>
         </div>
 
