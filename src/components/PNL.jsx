@@ -45,7 +45,7 @@ export default function PNL() {
         color: "#e2e8f0",
       }}
     >
-      <div id="report" className="report-content" style={{ maxWidth: "680px", margin: "0 auto" }}>
+      <div id="report" className="report-content">
         <div style={{ marginBottom: "36px" }}>
           <div
             style={{

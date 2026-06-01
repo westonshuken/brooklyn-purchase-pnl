@@ -35,7 +35,7 @@ export default function ExitAnalysis({ vals, purchasePrice, holdYears, updateFie
         background: "#0b1120",
         border: "1px solid #1e293b",
         borderRadius: "12px",
-        overflow: "hidden",
+        overflow: "visible",
         marginBottom: "24px",
       }}
     >
@@ -80,14 +80,7 @@ export default function ExitAnalysis({ vals, purchasePrice, holdYears, updateFie
           </span>
         </span>
       </div>
-      <div
-        className="exit-grid"
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(3, 1fr)",
-          gap: 0,
-        }}
-      >
+      <div className="exit-grid exit-grid-inner">
         {scenarios.map((s, i) => (
           <div
             key={s.label}
@@ -125,23 +118,23 @@ export default function ExitAnalysis({ vals, purchasePrice, holdYears, updateFie
             <div style={{ fontSize: "12px", color: "#64748b", lineHeight: "2" }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
                 <span style={rowLabelStyle}>Buy costs ({(BUYING_COSTS * 100).toFixed(1)}%)</span>
-                <span style={{ ...rowValueStyle, color: "#f87171" }}>({fmt(s.buyingCosts)})</span>
+                <span className="exit-row-value" style={{ ...rowValueStyle, color: "#f87171" }}>({fmt(s.buyingCosts)})</span>
               </div>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
                 <span style={rowLabelStyle}>Sale price</span>
-                <span style={{ ...rowValueStyle, color: "#94a3b8" }}>{fmt(s.salePrice)}</span>
+                <span className="exit-row-value" style={{ ...rowValueStyle, color: "#94a3b8" }}>{fmt(s.salePrice)}</span>
               </div>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
                 <span style={rowLabelStyle}>Sell costs ({sellCostPct}%)</span>
-                <span style={{ ...rowValueStyle, color: "#f87171" }}>({fmt(s.sellCosts)})</span>
+                <span className="exit-row-value" style={{ ...rowValueStyle, color: "#f87171" }}>({fmt(s.sellCosts)})</span>
               </div>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
                 <span style={rowLabelStyle}>Appr. gain</span>
-                <span style={{ ...rowValueStyle, color: "#94a3b8" }}>{fmt(s.netSaleProceeds)}</span>
+                <span className="exit-row-value" style={{ ...rowValueStyle, color: "#94a3b8" }}>{fmt(s.netSaleProceeds)}</span>
               </div>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
                 <span style={rowLabelStyle}>Cash flow ({years}yr)</span>
-                <span style={{ ...rowValueStyle, color: "#94a3b8" }}>{fmt(s.totalRentalIncome)}</span>
+                <span className="exit-row-value" style={{ ...rowValueStyle, color: "#94a3b8" }}>{fmt(s.totalRentalIncome)}</span>
               </div>
               <div
                 style={{
@@ -154,7 +147,7 @@ export default function ExitAnalysis({ vals, purchasePrice, holdYears, updateFie
                 }}
               >
                 <span style={rowLabelStyle}>Total profit</span>
-                <span style={{ ...rowValueStyle, color: s.color, fontWeight: 600 }}>{fmt(s.totalReturn)}</span>
+                <span className="exit-row-value" style={{ ...rowValueStyle, color: s.color, fontWeight: 600 }}>{fmt(s.totalReturn)}</span>
               </div>
             </div>
           </div>

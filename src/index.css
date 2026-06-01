@@ -21,6 +21,40 @@ input[type="number"]::-webkit-inner-spin-button {
   background: #0f172a55;
 }
 
+.report-content {
+  max-width: 680px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.exit-grid-inner {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0;
+  border-radius: 0 0 12px 12px;
+  overflow: hidden;
+}
+
+@media (min-width: 768px) {
+  .report-content {
+    max-width: 980px;
+  }
+
+  .exit-scenario {
+    min-width: 0;
+    padding: 20px 14px !important;
+  }
+
+  .exit-scenario .exit-row-value {
+    font-size: 11px;
+  }
+}
+
+.exit-row-value {
+  flex-shrink: 1;
+  min-width: 0;
+}
+
 @media (max-width: 640px) {
   .exit-grid {
     grid-template-columns: 1fr !important;
